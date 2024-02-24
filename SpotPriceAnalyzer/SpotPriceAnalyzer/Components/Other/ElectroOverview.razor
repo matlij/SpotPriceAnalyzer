@@ -1,0 +1,114 @@
+﻿@using SpotPriceAnalyzer.BusinessLayer
+@using BlazorBootstrap;
+@attribute [StreamRendering]
+
+<h2>Översikt</h2>
+
+@if (consumption == null)
+{
+    <p><em>Laddar...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Medelpris per kWh (SEK):</th>
+                <td>@consumption.AveragePrice kWh</td>
+            </tr>
+            <tr>
+                <th>Totalförbrukning kWh:</th>
+                <td>@consumption.TotalConsumption kWh</td>
+            </tr>
+            <tr>
+                <th>Kostnad rörligt pris (SEK):</th>
+                <td>@consumption.TotalFixed SEK</td>
+            </tr>
+            <tr>
+                <th>Kostnad timpris (SEK):</th>
+                <td>@consumption.TotalCostHourly SEK</td>
+            </tr>
+            <tr>
+                <th>Sparat med timpris (SEK):</th>
+                <td>@consumption.TotalSavings SEK</td>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+}
+
+<h2>Detaljer</h2>
+
+@if (consumption == null)
+{
+    <p><em>Laddar...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Datum</th>
+                <th>Konsumption (kWh)</th>
+                <th>Pris per kWh (SEK)</th>
+                <th>Kostnad rörligt pris (SEK)</th>
+                <th>Kostnad timpris (SEK)</th>
+                <th>Sparat med timpris (SEK)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var c in consumption.DayConsumption)
+            {
+                <tr>
+                    <td>@c.Date.ToShortDateString()</td>
+                    <td>@c.Consumption kWh</td>
+                    <td>@c.AveragePrice SEK</td>
+                    <td>@c.CostWithFixedPrice SEK</td>
+                    <td>@c.CostWithHourlyPrice SEK</td>
+                    <td>@c.PriceDiffrence SEK</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td>Sum</td>
+                <td>$180</td>
+                <td>$180</td>
+                <td>@consumption.TotalFixed SEK</td>
+                <td>@consumption.TotalCostHourly SEK</td>
+                <td>@consumption.TotalSavings</td>
+
+            </tr>
+        </tfoot>
+    </table>
+}
+
+@code {
+    [Parameter]
+    public DateOnly FromDate { get; set; }
+    [Parameter]
+    public DateOnly ToDate { get; set; }
+
+    private Consumption? consumption;
+    private ElectroRepository service = new ElectroRepository();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        try
+        {
+            consumption = null;
+            Console.WriteLine("OnParametersSetAsync");
+            Console.WriteLine("Fromdate: " + FromDate);
+            Console.WriteLine("Todate: " + ToDate);
+
+            consumption = await service.GetConsumption("hHYECYJUfCcxUbfFasjYmi4t59TDLFPPkE2Ox9yL214", FromDate, ToDate);
+            Thread.Sleep(1000);
+            Console.WriteLine();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+    }
+}

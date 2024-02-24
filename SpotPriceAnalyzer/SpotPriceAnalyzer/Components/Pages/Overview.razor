@@ -1,0 +1,35 @@
+﻿@page "/overview"
+@using BlazorBootstrap
+@using SpotPriceAnalyzer.BusinessLayer
+@using SpotPriceAnalyzer.Components.Other
+@rendermode InteractiveServer
+
+<PageTitle>Counter</PageTitle>
+
+<h1>Prisjämförelse</h1>
+
+<p>Jämför timpris med rörligt pris.</p>
+
+<table class="table" style="width: 40%">
+    <tbody>
+        <tr>
+            <th>Datum från:</th>
+            <td>
+                <DateInput TValue="DateOnly" @bind-Value="selectedFromDate" Placeholder="Enter Date" />
+            </td>
+        </tr>
+        <tr>
+            <th>Datum till:</th>
+            <td>
+                <DateInput TValue="DateOnly" @bind-Value="selectedToDate" Placeholder="Enter Date" />
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<ElectroOverview FromDate="@selectedFromDate" ToDate="@selectedToDate" />
+
+@code {
+    private DateOnly selectedFromDate = DateOnly.FromDateTime(DateTime.Now.AddDays(-1));
+    private DateOnly selectedToDate = DateOnly.FromDateTime(DateTime.Now);
+}
